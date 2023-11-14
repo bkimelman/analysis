@@ -14,13 +14,13 @@
 #include <phool/PHRandomSeed.h>
 #include <phool/recoConsts.h>
 
-#include <calotreegen/caloTreeGenCombine.h>
+#include <calotreegen/caloTowerCombineExtract.h>
 
 R__LOAD_LIBRARY(libfun4all.so)
 R__LOAD_LIBRARY(libcaloEmbedAnalysis.so)
 #endif
 
-  void Fun4All_CaloEmbed(const int nEvents = 100, const char *listFileData = "data_DSTs.list", const char *listFileSim = "sim_DSTs.list", const char *inName = "commissioning.root")
+void Fun4All_CaloTowerCombineExtract(const int nEvents = 0, const char *listFileData = "data_DSTs.list", const char *listFileSim = "sim_DSTs.list", const char *listFileTruth = "truth_DSTs.list", const char *inName = "caloTowerCombineExtract_eventData.root")
 {
   gSystem->Load("libg4dst.so");
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -30,32 +30,28 @@ R__LOAD_LIBRARY(libcaloEmbedAnalysis.so)
   Fun4AllSyncManager *sync = se->getSyncManager();
   sync->MixRunsOk(true);
 
-  Fun4AllInputManager *inData = new Fun4AllDstInputManager("DSTData");
+  Fun4AllInputManager *inData = new Fun4AllDstInputManager("DSTData","DST","TOPData");
   inData->AddListFile(listFileData);
+  inData->Verbosity(10);
   se->registerInputManager(inData);
 
   Fun4AllInputManager *inSim = new Fun4AllNoSyncDstInputManager("DSTSim","DST","TOPSim");
   inSim->AddListFile(listFileSim);
-  //inSim->Verbosity(10);
+  inSim->Verbosity(10);
   se->registerInputManager(inSim);
 
-  CaloTreeGenCombine *calo = new CaloTreeGenCombine();
-  calo->set_detector_type(CaloTreeGenCombine::CEMC);
+  Fun4AllInputManager *inTruth = new Fun4AllNoSyncDstInputManager("DSTTruth","DST","TOPTruth");
+  inTruth->AddListFile(listFileTruth);
+  inTruth->Verbosity(10);
+  se->registerInputManager(inTruth);
+
+
+  std::string outputName = inName;
+
+  caloTowerCombineExtract *calo = new caloTowerCombineExtract();
+  calo->setOutputFileName(outputName);
   se->registerSubsystem(calo,"TOPSim");
 
-
-  CaloTreeGenCombine *caloIH = new CaloTreeGenCombine();
-  caloIH->set_detector_type(CaloTreeGenCombine::HCALIN);
-  se->registerSubsystem(caloIH,"TOPSim");
-
-
-  CaloTreeGenCombine *caloOH = new CaloTreeGenCombine();
-  caloOH->set_detector_type(CaloTreeGenCombine::HCALOUT);
-  se->registerSubsystem(caloOH,"TOPSim");
-
-
-  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", inName);
-  se->registerOutputManager(out);
 
   se->run(nEvents);
   se->End();

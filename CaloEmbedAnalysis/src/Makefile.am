@@ -22,11 +22,12 @@ ROOTDICTS = caloTreeGenCombine_Dict.cc  caloTowerExtract_Dict.cc
 
 pcmdir = $(libdir)
 
-nobase_dist_pcm_DATA = caloTreeGenCombine_Dict_rdict.pcm  caloTowerExtract_Dict_rdict.pcm
+nobase_dist_pcm_DATA = caloTreeGenCombine_Dict_rdict.pcm  caloTowerExtract_Dict_rdict.pcm caloTowerCombineExtract_Dict_rdict.pcm
 
 pkginclude_HEADERS = \
   caloTreeGenCombine.h \
-  caloTowerExtract.h
+  caloTowerExtract.h \
+  caloTowerCombineExtract.h
 
 lib_LTLIBRARIES = \
   libcaloEmbedAnalysis.la
@@ -35,6 +36,7 @@ lib_LTLIBRARIES = \
 libcaloEmbedAnalysis_la_SOURCES = \
   caloTreeGenCombine.cc  \
   caloTowerExtract.cc \
+  caloTowerCombineExtract.cc \
   $(ROOTDICTS)
 
 libcaloEmbedAnalysis_la_LIBADD = \
@@ -51,7 +53,7 @@ noinst_PROGRAMS = \
 testexternals_SOURCES = testexternals.cc
 testexternals_LDADD   = libcaloEmbedAnalysis.la
 
-CALOEMBEDANALYSISOBJS = caloTreeGenCombine.o  caloTowerExtract.o derp.o
+CALOEMBEDANALYSISOBJS = caloTreeGenCombine.o  caloTowerExtract.o caloTowerCombineExtract.o derp.o
 
 testexternals.cc:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@
