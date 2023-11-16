@@ -3,10 +3,13 @@
 #include <calobase/TowerInfo.h>  // for TowerInfo
 #include <calobase/TowerInfoContainer.h>
 #include <calobase/TowerInfoContainerv1.h>
+#include <calobase/TowerInfoContainerv2.h>
 #include <calobase/TowerInfov1.h>
 #include <calobase/TowerInfoDefs.h>
 #include <calobase/RawTowerGeom.h>
 #include <calobase/RawTowerGeomContainer.h>
+
+#include <mbd/MbdOut.h>
 
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
@@ -118,6 +121,7 @@ int caloTowerCombineExtract::process_event(PHCompositeNode* topNode)
 {
 
 
+  std::cout << "working on event " << jetRecoTree->GetEntries() << std::endl;
   /*
   std::vector<ROOT::Math::PxPyPzEVector> dataTowers;
   std::vector<ROOT::Math::PxPyPzEVector> simTowers;
@@ -129,6 +133,36 @@ int caloTowerCombineExtract::process_event(PHCompositeNode* topNode)
   jetRecoTree->SetBranchAddress("embedTowers",&embedTowers);
   jetRecoTree->SetBranchAddress("truthTracks",&truthTracks);
   */
+
+  
+  double totalMBDEnergy = 0.0;
+  /*
+  unsigned int ntowers_MBD = _data_MBD->size();
+  for (unsigned int channel = 0; channel < ntowers_MBD; channel++)
+    {
+
+      if(TowerInfoDefs::get_mbd_type(TowerInfoDefs::encode_mbd(channel)) == 1){
+	totalMBDEnergy += _data_MBD->get_tower_at_channel(channel)->get_energy();
+      }
+    }
+  */
+  totalMBDEnergy = _data_MBD->get_q(0) + _data_MBD->get_q(1);
+
+  //  std::cout << "totalMBDEnergy=" << totalMBDEnergy << "   vtx pointer: " << _data_vtx_map->get(0) << "   vtxZ=" << _data_vtx_map->get(0)->get_z() << std::endl;
+  std::cout << "totalMBDEnergy=" << totalMBDEnergy << "   vtx pointer: " << _data_vtx_map->get(0) << std::endl;
+
+  double z_vtx = 0.0;
+  if(!_data_vtx_map->get(0)){
+    //return Fun4AllReturnCodes::ABORTEVENT;
+    z_vtx = -999.999;
+  }
+  else z_vtx = _data_vtx_map->get(0)->get_z();
+
+  eventData.clear();
+  eventData.push_back(z_vtx);
+  eventData.push_back(totalMBDEnergy);
+  
+
 
   dataTowers.clear();
   simTowers.clear();
@@ -313,24 +347,6 @@ int caloTowerCombineExtract::process_event(PHCompositeNode* topNode)
 
   std::cout << "finished particle loop" << std::endl;
 
-  double totalMBDEnergy = 0.0;
-  unsigned int ntowers_MBD = _data_MBD->size();
-  for (unsigned int channel = 0; channel < ntowers_MBD; channel++)
-    {
-
-      if(TowerInfoDefs::get_mbd_type(TowerInfoDefs::encode_mbd(channel)) == 1){
-	totalMBDEnergy += _data_MBD->get_tower_at_channel(channel)->get_energy();
-      }
-    }
-
-  double z_vtx = 0.0;
-  if(!_data_vtx_map->get(0)) z_vtx = -999.999;
-  else z_vtx = _data_vtx_map->get(0)->get_z();
-
-  eventData.clear();
-  eventData.push_back(z_vtx);
-  eventData.push_back(totalMBDEnergy);
-  
 
   jetRecoTree->Fill();
 
@@ -401,12 +417,23 @@ void caloTowerCombineExtract::CreateNodeTree(PHCompositeNode *topNode)
         "Failed to find DST node in RawTowerCalibration::CreateNodes");
   }
 
-  _data_MBD = findNode::getClass<TowerInfoContainerv1>(dstNode,"TOWERS_MBD");
+  PHCompositeNode *mbdNode = dynamic_cast<PHCompositeNode *>(dataIter.findFirst("PHCompositeNode", "MBD"));
+  if(!mbdNode){
+    std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
+              << "MBD Node missing, doing nothing." << std::endl;
+    throw std::runtime_error(
+        "Failed to find MBD node in RawTowerCalibration::CreateNodes");    
+  }
+
+  _data_MBD = findNode::getClass<MbdOut>(mbdNode, "MbdOut");
+  //  _data_MBD = findNode::getClass<TowerInfoContainerv1>(dstNode,"TOWERS_MBD");
   if(!_data_MBD){
     std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
-              << "TOWERS_MBD Node missing, doing nothing." << std::endl;
+              << "MbdOut Node missing, doing nothing." << std::endl;
+    //<< "TOWERS_MBD Node missing, doing nothing." << std::endl;
     throw std::runtime_error(
-        "Failed to find TOWERS_MBD node in RawTowerCalibration::CreateNodes");
+			     //"Failed to find TOWERS_MBD node in RawTowerCalibration::CreateNodes");
+        "Failed to find MbdOut node in RawTowerCalibration::CreateNodes");
   }
 
   _data_vtx_map = findNode::getClass<GlobalVertexMapv1>(dstNode,"GlobalVertexMap");
@@ -449,7 +476,7 @@ void caloTowerCombineExtract::CreateNodeTree(PHCompositeNode *topNode)
     
     //data
     std::string DataTowerNodeName = "TOWERINFO_CALIB_" + detector;
-    _data_towers[i] = findNode::getClass<TowerInfoContainerv1>(dstNode,
+    _data_towers[i] = findNode::getClass<TowerInfoContainerv2>(dstNode,
 							       DataTowerNodeName);
     if (!_data_towers[i])
       {

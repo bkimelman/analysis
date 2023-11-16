@@ -9,6 +9,7 @@
 
 #include <calobase/RawTowerGeom.h>
 #include <calobase/RawTowerGeomContainer.h>
+#include <mbd/MbdOut.h>
 
 #include <globalvertex/GlobalVertexMapv1.h>
 
@@ -27,6 +28,7 @@ class CDBInterface;
 class CDBTTree;
 class PHCompositeNode;
 class TowerInfoContainerv1;
+class TowerInfoContainerv2;
 class PHG4TruthInfoContainer;
 class PHG4Particle;
 class RawTowerGeomContainer;
@@ -73,10 +75,11 @@ class caloTowerCombineExtract : public SubsysReco
   void setOutputFileName(std::string fileName){ m_outputFileName = fileName; };
 
  private:
-  TowerInfoContainerv1 *_data_towers[3] = {nullptr,nullptr,nullptr};
+  TowerInfoContainerv2 *_data_towers[3] = {nullptr,nullptr,nullptr};
   TowerInfoContainerv1 *_sim_towers[3] = {nullptr,nullptr,nullptr};
   PHG4TruthInfoContainer *_truth_info = nullptr;
-  TowerInfoContainerv1 *_data_MBD = nullptr;
+  //TowerInfoContainerv1 *_data_MBD = nullptr;
+  MbdOut *_data_MBD = nullptr;
   GlobalVertexMapv1 *_data_vtx_map = nullptr;
 
   RawTowerGeomContainer *tower_geom = nullptr;

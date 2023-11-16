@@ -17,6 +17,7 @@
 #include <calotreegen/caloTowerCombineExtract.h>
 
 R__LOAD_LIBRARY(libfun4all.so)
+R__LOAD_LIBRARY(libmbd_io.so)
 R__LOAD_LIBRARY(libcaloEmbedAnalysis.so)
 #endif
 
@@ -32,17 +33,17 @@ void Fun4All_CaloTowerCombineExtract(const int nEvents = 0, const char *listFile
 
   Fun4AllInputManager *inData = new Fun4AllDstInputManager("DSTData","DST","TOPData");
   inData->AddListFile(listFileData);
-  inData->Verbosity(10);
+  //inData->Verbosity(10);
   se->registerInputManager(inData);
 
   Fun4AllInputManager *inSim = new Fun4AllNoSyncDstInputManager("DSTSim","DST","TOPSim");
   inSim->AddListFile(listFileSim);
-  inSim->Verbosity(10);
+  //inSim->Verbosity(10);
   se->registerInputManager(inSim);
 
   Fun4AllInputManager *inTruth = new Fun4AllNoSyncDstInputManager("DSTTruth","DST","TOPTruth");
   inTruth->AddListFile(listFileTruth);
-  inTruth->Verbosity(10);
+  //  inTruth->Verbosity(10);
   se->registerInputManager(inTruth);
 
 
