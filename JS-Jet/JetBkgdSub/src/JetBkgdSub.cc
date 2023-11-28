@@ -56,12 +56,14 @@ JetBkgdSub::JetBkgdSub(const double jet_R, const std::string& outputfilename)
   , _doAreaSub(false)
   , _doMultSub(false)
   , _doTruth(false)
+  , _isData(false)
   , m_event(-1)
   , m_rhoA_jets(0)
   , m_mult_jets(0)
   , m_iter_jets(0)
   , m_truth_jets(0)
   , m_centrality(-1)
+  , m_mbd_energy(-1)
   , m_rho_area(-1)
   , m_rho_area_sigma(-1)
   , m_event_leading_truth_pt(-1)
@@ -123,7 +125,8 @@ int JetBkgdSub::Init(PHCompositeNode *topNode)
   m_tree = new TTree("T", "JetBkgdSub");
   m_tree->Branch("event", &m_event, "event/I");
   m_tree->Branch("event_leading_truth_pt", &m_event_leading_truth_pt, "event_leading_truth_pt/F");
-  m_tree->Branch("centrality", &m_centrality, "centrality/I");
+  if(_isData) m_tree->Branch("mbd_energy", &m_mbd_energy, "mbd_enegry/D");
+  else m_tree->Branch("centrality", &m_centrality, "centrality/I");
   if(_doTruth)
   {
     m_tree->Branch("truth_jets", &m_truth_jets, "truth_jets/I");
@@ -178,10 +181,12 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   //==================================
   // Get centrality info
   //==================================
-  GetCentInfo(topNode);
+  if(_isData) GetMbdEnergy(topNode);
+  else GetCentInfo(topNode);
 
   // Leading truth jet pt (R = 0.4) (for simulation event selection)
-  m_event_leading_truth_pt = LeadingR04TruthJet(topNode);
+  if(_isData) m_event_leading_truth_pt = -1.0;
+  else m_event_leading_truth_pt = LeadingR04TruthJet(topNode);
 
   // ==================================
   // Get truth jet info
@@ -471,6 +476,12 @@ void JetBkgdSub::GetCentInfo(PHCompositeNode *topNode)
   }
   m_centrality = cent_node->get_centile(CentralityInfo::PROP::bimp);
   return ;
+}
+
+void JetBkgdSub::GetMbdEnergy(PHCompositeNode *topNode)
+{
+
+  return;
 }
 
 int JetBkgdSub::ResetEvent(PHCompositeNode *topNode)

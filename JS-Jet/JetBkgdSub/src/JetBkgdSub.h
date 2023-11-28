@@ -31,6 +31,7 @@ public:
     void doAreaSub(bool b = true) { _doAreaSub = b; }
     void doMultSub(bool b = true) { _doMultSub = b; }
     void doTruth(bool b = true) { _doTruth = b; }
+    void setIsData(bool b = true) { _isData = b; }
 
     void setEtaRange(double low, double high)
     {
@@ -60,6 +61,7 @@ public:
     void EstimateRhoMult(PHCompositeNode *topNode);
     double GetMedian(std::vector<double> &v);
     void GetCentInfo(PHCompositeNode *topNode);
+    void GetMbdEnergy(PHCompositeNode *topNode);
     float NSignalCorrection(float jet_pt, int cent);
 
 private:
@@ -78,6 +80,7 @@ private:
     bool _doAreaSub;
     bool _doMultSub;
     bool _doTruth;
+    bool _isData;
 
 
     //____________________________________________________________________________..
@@ -88,6 +91,7 @@ private:
     int m_iter_jets;
     int m_truth_jets;
     int m_centrality;
+    double m_mbd_energy;
     double m_rho_area;
     double m_rho_area_sigma;  
     double m_rho_mult;
