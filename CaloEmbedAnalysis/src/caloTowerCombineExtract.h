@@ -75,11 +75,11 @@ class caloTowerCombineExtract : public SubsysReco
   void setOutputFileName(std::string fileName){ m_outputFileName = fileName; };
 
  private:
-  TowerInfoContainerv2 *_data_towers[3] = {nullptr,nullptr,nullptr};
+  TowerInfoContainerv1 *_data_towers[3] = {nullptr,nullptr,nullptr};
   TowerInfoContainerv1 *_sim_towers[3] = {nullptr,nullptr,nullptr};
   PHG4TruthInfoContainer *_truth_info = nullptr;
-  //TowerInfoContainerv1 *_data_MBD = nullptr;
-  MbdOut *_data_MBD = nullptr;
+  TowerInfoContainerv1 *_data_MBD = nullptr;
+  //MbdOut *_data_MBD = nullptr;
   GlobalVertexMapv1 *_data_vtx_map = nullptr;
 
   RawTowerGeomContainer *tower_geom = nullptr;

@@ -136,7 +136,7 @@ int caloTowerCombineExtract::process_event(PHCompositeNode* topNode)
 
   
   double totalMBDEnergy = 0.0;
-  /*
+  
   unsigned int ntowers_MBD = _data_MBD->size();
   for (unsigned int channel = 0; channel < ntowers_MBD; channel++)
     {
@@ -145,8 +145,8 @@ int caloTowerCombineExtract::process_event(PHCompositeNode* topNode)
 	totalMBDEnergy += _data_MBD->get_tower_at_channel(channel)->get_energy();
       }
     }
-  */
-  totalMBDEnergy = _data_MBD->get_q(0) + _data_MBD->get_q(1);
+  
+  //totalMBDEnergy = _data_MBD->get_q(0) + _data_MBD->get_q(1);
 
   //  std::cout << "totalMBDEnergy=" << totalMBDEnergy << "   vtx pointer: " << _data_vtx_map->get(0) << "   vtxZ=" << _data_vtx_map->get(0)->get_z() << std::endl;
   std::cout << "totalMBDEnergy=" << totalMBDEnergy << "   vtx pointer: " << _data_vtx_map->get(0) << std::endl;
@@ -417,6 +417,7 @@ void caloTowerCombineExtract::CreateNodeTree(PHCompositeNode *topNode)
         "Failed to find DST node in RawTowerCalibration::CreateNodes");
   }
 
+  /*
   PHCompositeNode *mbdNode = dynamic_cast<PHCompositeNode *>(dataIter.findFirst("PHCompositeNode", "MBD"));
   if(!mbdNode){
     std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
@@ -424,9 +425,10 @@ void caloTowerCombineExtract::CreateNodeTree(PHCompositeNode *topNode)
     throw std::runtime_error(
         "Failed to find MBD node in RawTowerCalibration::CreateNodes");    
   }
+  */
 
-  _data_MBD = findNode::getClass<MbdOut>(mbdNode, "MbdOut");
-  //  _data_MBD = findNode::getClass<TowerInfoContainerv1>(dstNode,"TOWERS_MBD");
+  //_data_MBD = findNode::getClass<MbdOut>(mbdNode, "MbdOut");
+  _data_MBD = findNode::getClass<TowerInfoContainerv1>(dstNode,"TOWERS_MBD");
   if(!_data_MBD){
     std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
               << "MbdOut Node missing, doing nothing." << std::endl;
@@ -476,7 +478,7 @@ void caloTowerCombineExtract::CreateNodeTree(PHCompositeNode *topNode)
     
     //data
     std::string DataTowerNodeName = "TOWERINFO_CALIB_" + detector;
-    _data_towers[i] = findNode::getClass<TowerInfoContainerv2>(dstNode,
+    _data_towers[i] = findNode::getClass<TowerInfoContainerv1>(dstNode,
 							       DataTowerNodeName);
     if (!_data_towers[i])
       {
