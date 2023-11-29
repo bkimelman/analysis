@@ -23,6 +23,8 @@
 
 #include <jetbackground/TowerBackground.h>
 
+#include <mbd/MbdOut.h>
+
 #include "fastjet/AreaDefinition.hh"
 #include "fastjet/ClusterSequenceArea.hh"
 #include "fastjet/Selector.hh"
@@ -173,6 +175,8 @@ int JetBkgdSub::Init(PHCompositeNode *topNode)
 int JetBkgdSub::process_event(PHCompositeNode *topNode)
 {
   ++m_event;
+
+  std::cout << PHWHERE << "   working on event " << m_event << std::endl;
 
   // min reco jet pt cut 
   // sets min for all subtraction types
@@ -459,6 +463,7 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   //==================================
   m_tree->Fill();
 
+  std::cout << PHWHERE << "   done with event " << m_event << std::endl;
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -480,7 +485,24 @@ void JetBkgdSub::GetCentInfo(PHCompositeNode *topNode)
 
 void JetBkgdSub::GetMbdEnergy(PHCompositeNode *topNode)
 {
-
+  PHNodeIterator iter(topNode);
+  PHCompositeNode *mbdNode = dynamic_cast<PHCompositeNode *>(iter.findFirst("PHCompositeNode", "MBD"));
+  if(!mbdNode)
+  {
+    std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
+              << "MBD Node missing, doing nothing." << std::endl;
+    throw std::runtime_error(
+			     "Failed to find MBD node in JetBkgdSub::GetMbdEnergy");
+  }
+  MbdOut *_data_MBD = findNode::getClass<MbdOut>(mbdNode, "MbdOut");
+  if(!_data_MBD)
+  {
+    std::cerr << Name() << "::" <<  __PRETTY_FUNCTION__
+              << "MbdOut Node missing, doing nothing." << std::endl;
+    throw std::runtime_error(
+  			     "Failed to find MbdOut node in JetBkgdSub::GetMbdEnergy");
+  }
+  m_mbd_energy = _data_MBD->get_q(0) + _data_MBD->get_q(1);
   return;
 }
 
@@ -758,7 +780,7 @@ float JetBkgdSub::NSignalCorrection(float jet_pt, int cent)
     exit(1);
   }
 
-  if (nsignal < 0)
+  if (nsignal < 0 && !_isData)
   {
     std::cout << "JetBkgdSub::get_nsignal() - Error: nsignal = " << nsignal << std::endl;
     exit(1);
@@ -774,6 +796,7 @@ int JetBkgdSub::End(PHCompositeNode *topNode)
   // m_tree->Write();
   // write file to disk
   PHTFileServer::get().write(m_outputfilename);
+  PHTFileServer::get().close();
   std::cout << "JetBkgdSub::End(PHCompositeNode *topNode) This is the End..." << std::endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
