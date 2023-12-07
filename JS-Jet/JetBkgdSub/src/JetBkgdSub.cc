@@ -395,7 +395,9 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
     fastjet::AreaDefinition area_def(fastjet::active_area_explicit_ghosts, fastjet::GhostedAreaSpec(ghost_max_rap, 1, ghost_R));
     fastjet::JetDefinition jet_def_antikt(fastjet::antikt_algorithm, m_jet_R);
     fastjet::JetDefinition jet_def_bkgd(fastjet::kt_algorithm, m_jet_R); 
-    fastjet::Selector selector_rm2 = jetrap * (!fastjet::SelectorNHardest(2));
+    fastjet::Selector selector_rm2;
+    if(_isEmbed) selector_rm2 = jetrap * (!fastjet::SelectorNHardest(2));
+    else selector_rm2 = jetrap * (!fastjet::SelectorNHardest(3));
     fastjet::JetMedianBackgroundEstimator bge_rm2 {selector_rm2, jet_def_bkgd, area_def};
     // set particles for background estimation
     bge_rm2.set_particles(calo_pseudojets);

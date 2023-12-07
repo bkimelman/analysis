@@ -32,6 +32,7 @@ public:
     void doMultSub(bool b = true) { _doMultSub = b; }
     void doTruth(bool b = true) { _doTruth = b; }
     void setIsData(bool b = true) { _isData = b; }
+    void doEmbed(bool b = true) { _isEmbed = b; }
 
     void setEtaRange(double low, double high)
     {
@@ -81,6 +82,7 @@ private:
     bool _doMultSub;
     bool _doTruth;
     bool _isData;
+    bool _isEmbed;
 
 
     //____________________________________________________________________________..
