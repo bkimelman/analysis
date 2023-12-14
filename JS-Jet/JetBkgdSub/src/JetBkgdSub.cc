@@ -178,6 +178,7 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   ++m_event;
 
   std::cout << PHWHERE << "   working on event " << m_event << std::endl;
+  std::cout << "isData? " << _isData << "   isEmbed? " << _isEmbed << std::endl;
 
   // min reco jet pt cut 
   // sets min for all subtraction types
