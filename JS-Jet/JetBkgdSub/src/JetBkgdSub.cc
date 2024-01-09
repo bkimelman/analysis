@@ -25,6 +25,8 @@
 
 #include <mbd/MbdOut.h>
 
+#include <globalvertex/GlobalVertexMapv1.h>
+
 #include "fastjet/AreaDefinition.hh"
 #include "fastjet/ClusterSequenceArea.hh"
 #include "fastjet/Selector.hh"
@@ -183,6 +185,24 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   // min reco jet pt cut 
   // sets min for all subtraction types
   double min_reco_jet_pt = _minrecopT;
+
+
+  //get zVtx
+  GlobalVertexMapv1 *vtxMap = findNode::getClass<GlobalVertexMapv1>(topNode,"GlobalVertexMap");
+  if(!vtxMap){
+    std::cout << "JetBkgdSub::process_event(PHCompositeNode *topNode) Could not find global verted map node" << std::endl;
+    exit(-1);
+  }
+  if(!vtxMap->get(0)){
+    std::cout << "no vertex found" << std::endl;
+    return Fun4AllReturnCodes::ABORTEVENT;
+  }
+  double vtxZ = vtxMap->get(0)->get_z();
+  if(fabs(vtxZ)>10.0){
+    std::cout << "vertex not in range" << std::endl;
+    return Fun4AllReturnCodes::ABORTEVENT;
+  }
+    
 
   //==================================
   // Get centrality info
