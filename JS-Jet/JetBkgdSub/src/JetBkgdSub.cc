@@ -197,7 +197,8 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
     std::cout << "no vertex found" << std::endl;
     return Fun4AllReturnCodes::ABORTEVENT;
   }
-  double vtxZ = vtxMap->get(0)->get_z();
+  double vtxZ = -999.999;
+  vtxZ = vtxMap->get(0)->get_z();
   if(fabs(vtxZ)>10.0){
     std::cout << "vertex not in range" << std::endl;
     return Fun4AllReturnCodes::ABORTEVENT;
