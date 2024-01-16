@@ -186,22 +186,23 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   // sets min for all subtraction types
   double min_reco_jet_pt = _minrecopT;
 
-
+  if(_isData){
   //get zVtx
-  GlobalVertexMapv1 *vtxMap = findNode::getClass<GlobalVertexMapv1>(topNode,"GlobalVertexMap");
-  if(!vtxMap){
-    std::cout << "JetBkgdSub::process_event(PHCompositeNode *topNode) Could not find global verted map node" << std::endl;
-    exit(-1);
-  }
-  if(!vtxMap->get(0)){
-    std::cout << "no vertex found" << std::endl;
-    return Fun4AllReturnCodes::ABORTEVENT;
-  }
-  double vtxZ = -999.999;
-  vtxZ = vtxMap->get(0)->get_z();
-  if(fabs(vtxZ)>10.0){
-    std::cout << "vertex not in range" << std::endl;
-    return Fun4AllReturnCodes::ABORTEVENT;
+    GlobalVertexMapv1 *vtxMap = findNode::getClass<GlobalVertexMapv1>(topNode,"GlobalVertexMap");
+    if(!vtxMap){
+      std::cout << "JetBkgdSub::process_event(PHCompositeNode *topNode) Could not find global verted map node" << std::endl;
+      exit(-1);
+    }
+    if(!vtxMap->get(0)){
+      std::cout << "no vertex found" << std::endl;
+      return Fun4AllReturnCodes::ABORTEVENT;
+    }
+    double vtxZ = -999.999;
+    vtxZ = vtxMap->get(0)->get_z();
+    if(fabs(vtxZ)>10.0){
+      std::cout << "vertex not in range" << std::endl;
+      return Fun4AllReturnCodes::ABORTEVENT;
+    }
   }
     
 
@@ -212,7 +213,7 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   else GetCentInfo(topNode);
 
   // Leading truth jet pt (R = 0.4) (for simulation event selection)
-  if(_isData) m_event_leading_truth_pt = -1.0;
+  if(_isData || !_doTruth) m_event_leading_truth_pt = -1.0;
   else m_event_leading_truth_pt = LeadingR04TruthJet(topNode);
 
   // ==================================
