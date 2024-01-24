@@ -68,7 +68,7 @@ JetBkgdSub::JetBkgdSub(const double jet_R, const std::string& outputfilename)
   , m_iter_jets(0)
   , m_truth_jets(0)
   , m_centrality(-1)
-  , m_mbd_energy(-1)
+  , m_mbdNS_charge(-1)
   , m_rho_area(-1)
   , m_rho_area_sigma(-1)
   , m_event_leading_truth_pt(-1)
@@ -130,9 +130,9 @@ int JetBkgdSub::Init(PHCompositeNode *topNode)
   m_tree = new TTree("T", "JetBkgdSub");
   m_tree->Branch("event", &m_event, "event/I");
   m_tree->Branch("event_leading_truth_pt", &m_event_leading_truth_pt, "event_leading_truth_pt/F");
-  if(_isData) m_tree->Branch("mbd_energy", &m_mbd_energy, "mbd_enegry/D");
-  else m_tree->Branch("centrality", &m_centrality, "centrality/I");
-  if(_doTruth)
+  m_tree->Branch("centrality", &m_centrality, "centrality/I");
+  m_tree->Branch("mbdNS_charge", &m_mbdNS_charge, "mbdNS_charge/D");
+    if(_doTruth)
   {
     m_tree->Branch("truth_jets", &m_truth_jets, "truth_jets/I");
     m_tree->Branch("truth_ncomponent", &m_truth_ncomponent);
@@ -209,8 +209,8 @@ int JetBkgdSub::process_event(PHCompositeNode *topNode)
   //==================================
   // Get centrality info
   //==================================
-  if(_isData) GetMbdEnergy(topNode);
-  else GetCentInfo(topNode);
+  //GetMbdEnergy(topNode);
+  GetCentInfo(topNode);
 
   // Leading truth jet pt (R = 0.4) (for simulation event selection)
   if(_isData || !_doTruth) m_event_leading_truth_pt = -1.0;
@@ -505,10 +505,15 @@ void JetBkgdSub::GetCentInfo(PHCompositeNode *topNode)
       std::cout << "JetBkgdSub::process_event() ERROR: Can't find CentralityInfo" << std::endl;
       exit(-1);
   }
-  m_centrality = cent_node->get_centile(CentralityInfo::PROP::bimp);
+  
+
+  if(!_isData) m_centrality = cent_node->get_centile(CentralityInfo::PROP::bimp);
+  else m_centrality = (int)(100*cent_node->get_centile(CentralityInfo::PROP::mbd_NS));
+  m_mbdNS_charge = cent_node->get_quantity(CentralityInfo::PROP::mbd_NS);
   return ;
 }
 
+/*
 void JetBkgdSub::GetMbdEnergy(PHCompositeNode *topNode)
 {
   PHNodeIterator iter(topNode);
@@ -531,7 +536,7 @@ void JetBkgdSub::GetMbdEnergy(PHCompositeNode *topNode)
   m_mbd_energy = _data_MBD->get_q(0) + _data_MBD->get_q(1);
   return;
 }
-
+*/
 int JetBkgdSub::ResetEvent(PHCompositeNode *topNode)
 {
   

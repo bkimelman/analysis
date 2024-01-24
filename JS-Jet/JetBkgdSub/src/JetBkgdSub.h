@@ -93,7 +93,7 @@ private:
     int m_iter_jets;
     int m_truth_jets;
     int m_centrality;
-    double m_mbd_energy;
+    double m_mbdNS_charge;
     double m_rho_area;
     double m_rho_area_sigma;  
     double m_rho_mult;
