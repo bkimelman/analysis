@@ -18,6 +18,7 @@
 class PHCompositeNode;
 class TTree;
 class SvtxTrackState;
+class RunHeader;
 
 class InclusiveJet : public SubsysReco
 {
@@ -92,6 +93,26 @@ class InclusiveJet : public SubsysReco
     m_doLeadPtCut = true;
     m_leadPtCut = leadpt;
   }
+  void
+  setTruthLeadPtCut(float leadpt) 
+  {
+    m_doTruthLeadPtCut = true;
+    m_truthLeadPtCut = leadpt;
+  }
+  void
+  doMBDeff(int flag) 
+  {
+    m_doMBDeff = flag;
+  }
+  void doMBDeffsyst(int flag)
+  {
+    m_doMBDeffsyst = flag;
+  }
+  void
+  doCalibJet(int flag)
+  {
+    m_doCalibJet = flag;
+  }
 
   float calculateProjectionEta(SvtxTrackState* projectedState);
   float calculateProjectionPhi(SvtxTrackState* projectedState);
@@ -153,6 +174,7 @@ class InclusiveJet : public SubsysReco
 
   //!trigger info
   std::vector<int> m_triggerVector;
+  std::vector<int> m_liveTriggerVector;
 
   //! reconstructed jets
   std::vector<int> m_nComponent;
@@ -160,9 +182,12 @@ class InclusiveJet : public SubsysReco
   std::vector<float> m_phi;
   std::vector<float> m_e;
   std::vector<float> m_pt;
+  std::vector<float> m_calibpt;
   std::vector<float> m_jetEmcalE;
   std::vector<float> m_jetIhcalE;
   std::vector<float> m_jetOhcalE;
+  std::vector<float> m_jettime;
+  std::vector<float> m_jetunweighttime;
 
   //! truth jets
   std::vector<int> m_truthNComponent;
@@ -186,11 +211,32 @@ class InclusiveJet : public SubsysReco
 
   bool m_doTriggerCut = false;
   bool m_doLeadPtCut = true;
+  bool m_doTruthLeadPtCut = false;
+  bool m_doMBDeff = false;
+  bool m_doMBDeffsyst = false;
+  bool m_doCalibJet = true;
   
   float m_totalCalo;
-  float m_zvtx;
+  float m_zvtx = -9999;
+  float m_zsvtx = -9999;
+  float m_ztruthvtx = -9999;
+  float m_zsiliconvtx = -9999;
+
+  std::vector<float> m_svtxVector;
+  std::vector<int> m_svtxBcoVector;
+  std::vector<float> m_siliconVector;
+  std::vector<int> m_siliconBcoVector;
+
+  float m_mbd_t0 = 0.;
+  float m_mbd_ts = 0.;
+  float m_mbd_tn = 0.;
+
+  RunHeader* runheader = nullptr;
+  int runnumber;
+  float m_t0corr = 0;
 
   float m_leadPtCut = 10.0;
+  float m_truthLeadPtCut = 17.0;
 
   int m_emcaln = 0;
   float m_emcale[24576] = {0}; 
@@ -228,6 +274,14 @@ class InclusiveJet : public SubsysReco
   float truthpar_phi[100000];
   int truthpar_pid[100000];
 
+  int old_truthpar_n;
+  float old_truthpar_pz[100000];
+  float old_truthpar_pt[100000];
+  float old_truthpar_e[100000];
+  float old_truthpar_eta[100000];
+  float old_truthpar_phi[100000];
+  int old_truthpar_pid[100000];
+
   int m_emcal_clsmult;
   float m_emcal_cluster_e[2000];
   float m_emcal_cluster_eta[2000];
@@ -242,6 +296,26 @@ class InclusiveJet : public SubsysReco
   int m_cluster_tower_ieta[2000][500];
   int m_cluster_tower_iphi[2000][500];
   float m_cluster_tower_e[2000][500];
+
+  int m_clsmult2;
+  float m_cluster2_e[2000];
+  float m_cluster2_eta[2000];
+  float m_cluster2_phi[2000];
+  int m_cluster2_ntowers[2000];
+  int m_cluster2_tower_calo[2000][500];
+  int m_cluster2_tower_ieta[2000][500];
+  int m_cluster2_tower_iphi[2000][500];
+  float m_cluster2_tower_e[2000][500];
+
+  int m_clsmult4;
+  float m_cluster4_e[2000];
+  float m_cluster4_eta[2000];
+  float m_cluster4_phi[2000];
+  int m_cluster4_ntowers[2000];
+  int m_cluster4_tower_calo[2000][500];
+  int m_cluster4_tower_ieta[2000][500];
+  int m_cluster4_tower_iphi[2000][500];
+  float m_cluster4_tower_e[2000][500];
 
   int m_trkmult;
   unsigned int _nlayers_maps = 3;
@@ -258,7 +332,7 @@ class InclusiveJet : public SubsysReco
   int m_tr_nmaps[2000];
   int m_tr_ntpc[2000];
   float m_tr_quality[2000];
-  int m_tr_vertex_id[2000];
+  int m_tr_crossing[2000];
   float m_tr_cemc_eta[2000]; // Projection of track to calorimeters
   float m_tr_cemc_phi[2000];
   float m_tr_ihcal_eta[2000];
