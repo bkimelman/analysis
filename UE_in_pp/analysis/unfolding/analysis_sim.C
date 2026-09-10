@@ -854,14 +854,14 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
             if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.5) { continue; }
             float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
+            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_truth_et_transverse += (truthpar_pid[i] == 22 || truthpar_pid[i] == 111 ? 1.0 : 0.36)*truthpar_e[i]/cosh(truthpar_eta[i]); } 
         }
         float reco_thres_truth_et_transverse = 0;
         for (int i = 0; i < truthpar_n; i++) {
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
             if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.4352) { continue; }
             float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_thres_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
+            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_thres_truth_et_transverse += (truthpar_pid[i] == 22 || truthpar_pid[i] == 111 ? 1.0 : 0.36)*truthpar_e[i]/cosh(truthpar_eta[i]); } 
         }
 
         // can toggle reco pT cut, reco bkg cut and match requirement for efficiency 
