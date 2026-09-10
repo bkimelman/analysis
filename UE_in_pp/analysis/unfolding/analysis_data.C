@@ -473,7 +473,7 @@ void analysis_data(int runnumber = 51274, std::string bkg_cut = "dijet", bool cl
 
       for (int i = 0; i < clsmult; i++) {
         float dphi = get_dphi(lead.Phi(),cluster_phi[i]);
-        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cluster_eta[i] > -1.0) { 
+        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cosh(cluster_eta[i]) > -1.0) { 
           et_transverse += cluster_e[i]/cosh(cluster_eta[i]); 
         }
       }
@@ -481,21 +481,21 @@ void analysis_data(int runnumber = 51274, std::string bkg_cut = "dijet", bool cl
       for (int i = 0; i < clsmult; i++) {
         float phi_var = cluster_phi[i] + phiResRandGen.Gaus(0.0, 0.005);
         float dphi = get_dphi(lead.Phi(),phi_var);
-        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cluster_eta[i] > -1.0) { 
+        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cosh(cluster_eta[i]) > -1.0) { 
           et_transverse_phi_res += cluster_e[i]/cosh(cluster_eta[i]); 
         }
       }
 
       for (int i = 0; i < clsmult2; i++) {
         float dphi = get_dphi(lead.Phi(),cluster2_phi[i]);
-        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster2_e[i]/cluster2_eta[i] > -1.0) { 
+        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster2_e[i]/cosh(cluster2_eta[i]) > -1.0) { 
           et_transverse_2sigma += cluster2_e[i]/cosh(cluster2_eta[i]); 
         }
       }
 
       for (int i = 0; i < clsmult4; i++) {
         float dphi = get_dphi(lead.Phi(),cluster4_phi[i]);
-        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster4_e[i]/cluster4_eta[i] > -1.0) { 
+        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster4_e[i]/cosh(cluster4_eta[i]) > -1.0) { 
           et_transverse_4sigma += cluster4_e[i]/cosh(cluster4_eta[i]); 
         }
       }
@@ -510,7 +510,7 @@ void analysis_data(int runnumber = 51274, std::string bkg_cut = "dijet", bool cl
       et_transverse_had_resp_down = et_transverse * (1.0 - had_resp_var);; 
       for (int i = 0; i < clsmult; i++) {
         float dphi = get_dphi(lead.Phi(),cluster_phi[i]);
-        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cluster_eta[i] > -1.0) {
+        if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cosh(cluster_eta[i]) > -1.0) {
           for (int j = 0; j < cluster_ntowers[i]; j++) {
             if (cluster_tower_calo[i][j] == 1) {
               et_transverse_emcal_scale_up += emcal_scale_var*cluster_tower_e[i][j]/(cosh(cluster_eta[i]));

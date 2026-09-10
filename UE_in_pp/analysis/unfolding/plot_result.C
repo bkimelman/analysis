@@ -462,7 +462,7 @@ void plot_result(int dijet = 1) {
     }
 
     for (int i = 0; i < 2; i++) {
-        h_truth_prof.push_back(h_truth_2D[i]->ProfileX(("truth_prof_"+truth_syst[i]).c_str(),1,h_truth_2D[i]->GetNbinsY()-1));
+        h_truth_prof.push_back(h_truth_2D[i]->ProfileX(("truth_prof_"+truth_syst[i]).c_str(),1,h_truth_2D[i]->GetNbinsY()));
         int tnbins = h_truth_prof[i]->GetNbinsX();
         const TAxis* txaxis = h_truth_prof[i]->GetXaxis();
         std::vector<double> tedges(tnbins + 1);
@@ -516,7 +516,7 @@ void plot_result(int dijet = 1) {
     };
 
     for (int i = 0; i < (int)h_unfold_2D.size(); i++) {
-        h_unfold_prof.push_back(h_unfold_2D[i]->ProfileX(get_unfold_prof_name(i).c_str(),1,h_truth_2D[0]->GetNbinsY()-1));
+        h_unfold_prof.push_back(h_unfold_2D[i]->ProfileX(get_unfold_prof_name(i).c_str(),1,h_truth_2D[0]->GetNbinsY()));
         int nbins = h_unfold_prof[i]->GetNbinsX();
         const TAxis* xaxis = h_unfold_prof[i]->GetXaxis();
         std::vector<double> edges(nbins + 1);

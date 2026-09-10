@@ -829,7 +829,7 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
             
             for (int i = 0; i < clsmult; i++) {
                 float dphi = get_dphi(lead.Phi(),cluster_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cluster_eta[i] > -1.0) { 
+                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cosh(cluster_eta[i]) > -1.0) { 
                     et_transverse += cluster_e[i]/cosh(cluster_eta[i]); 
                     et_transverse_clus_smear += (cluster_e[i] * (1.0 + clusERandGen.Gaus(0,0.08)))/(cosh(cluster_eta[i]));
                 }
@@ -837,14 +837,14 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
             
             for (int i = 0; i < clsmult2; i++) {
                 float dphi = get_dphi(lead.Phi(),cluster2_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster2_e[i]/cluster2_eta[i] > -1.0) { 
+                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster2_e[i]/cosh(cluster2_eta[i]) > -1.0) { 
                     et_transverse_2sigma += cluster2_e[i]/cosh(cluster2_eta[i]); 
                 }
             }
 
             for (int i = 0; i < clsmult4; i++) {
                 float dphi = get_dphi(lead.Phi(),cluster4_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster4_e[i]/cluster4_eta[i] > -1.0) { 
+                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster4_e[i]/cosh(cluster4_eta[i]) > -1.0) { 
                     et_transverse_4sigma += cluster4_e[i]/cosh(cluster4_eta[i]); 
                 }
             }
@@ -852,7 +852,7 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
             et_transverse_ohcal_mc_data_var = et_transverse;
             for (int i = 0; i < clsmult; i++) {
                 float dphi = get_dphi(lead.Phi(),cluster_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cluster_eta[i] > -1.0) {
+                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0 && cluster_e[i]/cosh(cluster_eta[i]) > -1.0) {
                   for (int j = 0; j < cluster_ntowers[i]; j++) {
                     if (cluster_tower_calo[i][j] == 2) {
                         et_transverse_ohcal_mc_data_var += (ohcal_scale_eta[cluster_tower_ieta[i][j]]-1.0)*cluster_tower_e[i][j]/(cosh(cluster_eta[i]));
@@ -866,8 +866,7 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
         float truth_et_transverse = 0;
         for (int i = 0; i < truthpar_n; i++) {
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
-            if ((truthpar_pid[i] == 22 || truthpar_pid[i] == 111) && fabs(truthpar_e[i]) < 0.2) { continue; } // edited back to 0.2 for sPHENIX primary particle list
-            else if (fabs(truthpar_e[i]) < 0.5) { continue; } // edited back to 0.5
+            if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.5) { continue; } // edited back to 0.2 for sPHENIX primary particle list
             float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
             if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { 
                 truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); 
@@ -879,31 +878,23 @@ void analysis_sim(std::string runtype = "mb", int start_seg = 0, int end_seg = 2
         float thres_truth_et_transverse = 0;
         for (int i = 0; i < truthpar_n; i++) {
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
-            if (fabs(truthpar_e[i]) < 0.4352) { continue; }
+            if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.4352) { continue; }
             float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
             if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { thres_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
         }
         float reco_truth_et_transverse = 0;
         for (int i = 0; i < truthpar_n; i++) {
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
-            if ((truthpar_pid[i] == 22 || truthpar_pid[i] == 111) && fabs(truthpar_e[i]) > 0.2) {
-                float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
-            } else if (fabs(truthpar_e[i] > 0.2)) {
-                float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_truth_et_transverse += 0.36*truthpar_e[i]/cosh(truthpar_eta[i]); } 
-            }
+            if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.5) { continue; }
+            float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
+            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
         }
         float reco_thres_truth_et_transverse = 0;
         for (int i = 0; i < truthpar_n; i++) {
             if (fabs(truthpar_eta[i]) > 1.1) { continue; }
-            if ((truthpar_pid[i] == 22 || truthpar_pid[i] == 111) && fabs(truthpar_e[i]) > 0.4352) {
-                float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_thres_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
-            } else if (fabs(truthpar_e[i] > 0.4352)) {
-                float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
-                if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_thres_truth_et_transverse += 0.36*truthpar_e[i]/cosh(truthpar_eta[i]); } 
-            }
+            if (truthpar_e[i] / cosh(truthpar_eta[i]) < 0.4352) { continue; }
+            float dphi = get_dphi(truthlead.Phi(),truthpar_phi[i]);
+            if (fabs(dphi) > M_PI/3.0 && fabs(dphi) < (2.0*M_PI)/3.0) { reco_thres_truth_et_transverse += truthpar_e[i]/cosh(truthpar_eta[i]); } 
         }
 
         // can toggle reco pT cut, reco bkg cut and match requirement for efficiency 
